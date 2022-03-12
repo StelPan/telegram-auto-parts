@@ -1,20 +1,43 @@
-const Emoji = require("node-emoji")
 const { Markup } = require("telegraf")
+const Emoji = require("node-emoji")
 
-const StartKeyboard = Markup.keyboard([
+const CATALOG_TYPE = "CATALOG_TYPE"
+const CART_TYPE = "CART_TYPE"
+const SEARCH_TYPE = "SEARCH_TYPE"
+const ORDERS_TYPE = "ORDERS_TYPE"
+const CONTACTS_TYPE = "CONTACTS_TYPE"
+const FAQ_TYPE = "FAQ_TYPE"
+const SETTINGS_TYPE = "SETTINGS_TYPE"
+
+const KEYS = {
+    [CATALOG_TYPE]: "Каталог " + Emoji.get("blue_book"),
+    [CART_TYPE]: "Корзина " + Emoji.get("shopping_trolley"),
+    [SEARCH_TYPE]: "Поиск " + Emoji.get("mag"),
+    [ORDERS_TYPE]: "Заказы " + Emoji.get("scroll"),
+    [CONTACTS_TYPE]: "Контакты " + Emoji.get("iphone"),
+    [FAQ_TYPE]: "FAQ " + Emoji.get("question"),
+    [SETTINGS_TYPE]: "Настройки " + Emoji.get("gear")
+}
+
+const keyboard = Markup.keyboard([
     [
-        "Каталог " + Emoji.get("blue_book"),
-        "Корзина " + Emoji.get("shopping_trolley"),
+        KEYS[CATALOG_TYPE],
+        KEYS[CART_TYPE]
     ],
     [
-        "Поиск " + Emoji.get("mag"),
-        "Заказы " + Emoji.get("scroll")
+        KEYS[SEARCH_TYPE],
+        KEYS[ORDERS_TYPE]
     ],
     [
-        "Контакты " + Emoji.get("iphone"),
-        "FAQ " + Emoji.get("question")
+        KEYS[CONTACTS_TYPE],
+        KEYS[FAQ_TYPE]
     ],
-    [ "Настройки " + Emoji.get("gear") ],
+    [
+        KEYS[SETTINGS_TYPE]
+    ]
 ])
 
-module.exports = { StartKeyboard }
+module.exports = {
+    keyboard,
+    keys: KEYS,
+}

@@ -1,11 +1,22 @@
-require("dotenv").config({ path: "./.env" })
+const path = require("path")
+const dotenv = require("dotenv")
+const server = require("./http/server")
 
-const telegraf = require("./plugins/telegraf")
-
-telegraf.start(async (ctx) => {
-    await ctx.scene.enter("PreviewScene");
+dotenv.config({
+    path: path.resolve("./", ".env")
 })
 
-telegraf
-    .launch()
-    .then(() => console.log("start"))
+const {
+    bot,
+    webhookPath
+} = require("./plugins/telegraf")
+
+async function start () {
+    await bot.launch()
+
+    await server(function (app) {
+        app.use(bot.webhookCallback(webhookPath))
+    })
+}
+
+start();
