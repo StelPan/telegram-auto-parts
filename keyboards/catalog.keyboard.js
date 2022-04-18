@@ -1,4 +1,5 @@
 const { Markup } = require("telegraf")
+const emoji = require("node-emoji");
 
 const CHUCK_ARRAY = 4
 
@@ -29,12 +30,12 @@ const InlineKeyboard = (categories, count, page = 1, limit) => {
     })
 
     let nav = [
-        Markup.button.callback("Назад", `PAGE:${page - 1}`),
-        Markup.button.callback("В меню", "GO_TO_HOME"),
+        Markup.button.callback(emoji.get("arrow_left") +" Назад", `PAGE:${page - 1}`),
+        Markup.button.callback("В меню " + emoji.get("leftwards_arrow_with_hook"), "GO_TO_HOME"),
     ]
 
     if (page * limit < count) {
-        nav.push(Markup.button.callback("Вперед", `PAGE:${page + 1}`))
+        nav.push(Markup.button.callback("Вперед " + emoji.get("arrow_right"), `PAGE:${page + 1}`))
     }
 
     keyboard.push(nav)

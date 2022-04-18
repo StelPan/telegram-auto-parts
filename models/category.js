@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     underscored: true
   });
+  // category.addScope("includesAll", )
   category.associate = function(models) {
     category.belongsToMany(models.product, {
       through: "category_products",

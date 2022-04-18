@@ -9,7 +9,7 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       user_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.BIGINT
       },
       created_at: {
         allowNull: false,

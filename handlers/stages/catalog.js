@@ -1,13 +1,14 @@
-const { Scenes: { BaseScene }, Markup } = require("telegraf")
-const CatalogKeyboard = require("../../keyboards/catalog.keyboard")
-const { editProductKeyboard } = require("../../keyboards/product.inline")
-const { category, product, cart, user, favorite } = require("../../models")
+const { Composer } = require("telegraf");
+const CatalogKeyboard = require("../../keyboards/catalog.keyboard");
+const { editProductKeyboard } = require("../../keyboards/product.inline");
+const { category, product, cart, favorite } = require("../../models");
+const { keys } = require("../../keyboards/start.keyboard");
 
-const Catalog = new BaseScene("CatalogScene")
+const composer = new Composer();
 
 const LIMIT_VIEW_PRODUCT = 2
 
-Catalog.enter(async (ctx) => {
+composer.hears(keys.CATALOG_TYPE,async (ctx) => {
     const catalog = category.findAll({ limit: LIMIT_VIEW_PRODUCT });
     const countCatalog = category.count();
 
@@ -26,7 +27,7 @@ Catalog.enter(async (ctx) => {
 /**
  * Пагинация
  */
-Catalog.action(/PAGE:[0-9]+/, async (ctx) => {
+composer.action(/^PAGE:[0-9]+$/, async (ctx) => {
     await ctx.answerCbQuery();
 
     const page = +ctx
@@ -56,12 +57,12 @@ Catalog.action(/PAGE:[0-9]+/, async (ctx) => {
     await ctx.editMessageText(message, keyboard);
 });
 
-Catalog.action(/(CATEGORY:[0-9]+|PAGE_PRODUCT:[0-9]+)/, require("./actions/view-product.action"));
+composer.action(/(CATEGORY:[0-9]+|PAGE_PRODUCT:[0-9]+)/, require("../scenes/actions/view-product.action"));
 
 /**
  * Добавление в корзину
  */
-Catalog.action(/ADD_TO_CART:[0-9]+/, async (ctx) => {
+composer.action(/ADD_TO_CART:[0-9]+/, async (ctx) => {
     try {
         const [, productId] = ctx.update.callback_query.data.split(":");
         const userId        = ctx.update.callback_query.from.id
@@ -90,8 +91,8 @@ Catalog.action(/ADD_TO_CART:[0-9]+/, async (ctx) => {
 
         inlineKeyboard =
             inlineKeyboard
-            .arrayToInline()
-            .getKeyboard()
+                .arrayToInline()
+                .getKeyboard()
 
         await ctx.editMessageCaption(caption, {
             parse_mode: "Markdown",
@@ -102,12 +103,7 @@ Catalog.action(/ADD_TO_CART:[0-9]+/, async (ctx) => {
     }
 })
 
-Catalog.action(/ADD_TO_FAVORITE:[0-9]+/, async (ctx) => {
-    // TODO: Logical add to favorite products..
-    // TODO: Получить текущую клавиатуру []
-    // TODO: Найти товар по id []
-    // TODO: Добавить в избранные []
-    // TODO: отправить сообщение обратно, уже с измененной клавиатурой []
+composer.action(/ADD_TO_FAVORITE:[0-9]+/, async (ctx) => {
     try {
         const callbackQuery = ctx.update.callback_query;
 
@@ -126,7 +122,6 @@ Catalog.action(/ADD_TO_FAVORITE:[0-9]+/, async (ctx) => {
 
         const [favorites, created]  = await favorite.findOrCreate({where: { user_id: id }});
         const products              = await product.findByPk(productId);
-        const client                = await user.findByPk(id);
 
         const keyboard = editProductKeyboard(reply_markup.inline_keyboard);
 
@@ -153,16 +148,16 @@ Catalog.action(/ADD_TO_FAVORITE:[0-9]+/, async (ctx) => {
     }
 })
 
-Catalog.action(/GO_TO_HOME/, async (ctx) => {
-    await ctx.deleteMessage()
-    await ctx.scene.enter("PreviewScene");
+composer.action(/GO_TO_HOME/, async (ctx) => {
+    await ctx.deleteMessage();
+    await ctx.scene.leave();
 });
 
-Catalog.action(/GO_TO_CATALOG/, async (ctx) => {
-    ctx.session.isSendPhoto = undefined;
+composer.action(/GO_TO_CATALOG/, async (ctx) => {
     await ctx.answerCbQuery();
     await ctx.deleteMessage();
-    await ctx.scene.enter("CatalogScene");
+
+    // await ctx.scene.enter("CatalogScene");
 })
 
-module.exports = Catalog;
+module.exports = composer;

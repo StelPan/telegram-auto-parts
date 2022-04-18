@@ -1,17 +1,9 @@
-const { Composer, Scenes: { Stage } } = require("telegraf")
+const { Composer, Scenes: { Stage } } = require("telegraf");
 
-const stage = new Stage()
+const stage = new Stage();
+stage.register(require("../scenes/complete-order.wizard"));
 
-// Дефолтная сцена
-stage.register(require("../scenes/preview.scene"))
+const composer = new Composer();
+composer.use(stage.middleware());
 
-// Отображение каталога
-stage.register(require("../scenes/catalog.scene"))
-
-// Корзина пользователя
-stage.register(require("../scenes/cart.scene"));
-
-const composer = new Composer()
-composer.use(stage.middleware())
-
-module.exports = composer
+module.exports = composer;

@@ -1,5 +1,5 @@
 const path = require("path");
-const { category, cart, cart_product, image, favorite, favorite_product }  = require("../../../models");
+const { category, cart, favorite }  = require("../../../models");
 const productKeyboard = require("../../../keyboards/product.inline");
 
 const switchMethodCtx = async (ctx, method, params) => {
@@ -8,8 +8,6 @@ const switchMethodCtx = async (ctx, method, params) => {
 
 const ViewProduct = async (ctx) => {
     try {
-        await ctx.answerCbQuery();
-
         const fullMask = /^CATEGORY:[0-9]+;PAGE_PRODUCT:[0-9]+$/
         const categoryMask = /^CATEGORY:[0-9]+$/
 
@@ -39,19 +37,13 @@ const ViewProduct = async (ctx) => {
         }
 
         const findCategory      = await category.findByPk(+categoryId)
-
+        const findFavorite      = await favorite.findOne({ where: { user_id: id }})
         const findCart          = await cart.findOne({ where: { user_id: id }})
-
         const findProduct       = await findCategory.getProducts({
             limit: 1,
             offset: productPage,
-            include: [{
-                model: cart,
-                through: {
-                    model: cart_product,
-                    where: { cart_id: findCart.id }
-                },
-            }, { model: image }]
+            scope: [{ method: ["full", { cart_id: findCart.id, favorite_id: findFavorite.id }]}],
+            order: [["id", "asc"]]
         });
 
         const product = findProduct[0]
@@ -61,9 +53,10 @@ const ViewProduct = async (ctx) => {
             `Цена: ${product.get("price") + "руб."} \r\n` +
             `Описание: ${product.get("description")} \r\n`
 
-        const keyboard = productKeyboard.createKeyboard(
+        let keyboard = productKeyboard.createKeyboard(
             product.id,
             !!product.get("carts").length,
+            !!product.get("favorites").length,
             productPage,
             categoryId
         )
@@ -76,15 +69,24 @@ const ViewProduct = async (ctx) => {
 
         const sourceHttp = process.env.TELEGRAM_WEBHOOK_URL + `/images/${product.get("images")[0].source}`
 
-        const method = !ctx.session?.isSendPhoto ?
+        const isSendPhoto = ctx
+            .update
+            .callback_query
+            .message
+            ?.photo
+            ?.length;
+
+        const method = !isSendPhoto ?
             "replyWithPhoto" :
             "editMessageMedia";
 
-        !ctx.session?.isSendPhoto ?
+        !isSendPhoto ?
             await ctx.deleteMessage() :
             ""
 
-        const params = !ctx.session?.isSendPhoto ?
+        // console.log(method, sourceHttp, source);
+
+        const params = !isSendPhoto ?
             [{ source }, {
                 caption: message,
                 parse_mode: "Markdown",
@@ -94,11 +96,10 @@ const ViewProduct = async (ctx) => {
                 ...keyboard
             }];
 
-        await switchMethodCtx(ctx, method, params)
+        console.log("PARAMS", params);
 
-        !ctx.session?.isSendPhoto ?
-            ctx.session.isSendPhoto = true :
-            null
+        await ctx.answerCbQuery();
+        await switchMethodCtx(ctx, method, params)
     } catch (e) {
         console.error(e)
     }
