@@ -13,7 +13,8 @@ dotenv.config({
 // Middlewares
 const { JWTMiddleware } = require("./middlewares/jwt");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.APP_PORT || 3000;
+const API = process.env.APP_API || "127.0.4.3";
 
 app.use(express.static("static"));
 app.use(cors());
@@ -41,7 +42,7 @@ app.use("/order-statuses", require("./routes/statuses"));
 async function listen (cb = null) {
     cb(app)
 
-    app.listen(PORT, () => console.log(`Server started on ${PORT}..`));
+    app.listen(API, PORT, () => console.log(`Server started on ${PORT}..`));
 }
 
 module.exports = listen;

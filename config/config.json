@@ -16,11 +16,11 @@
     "operatorsAliases": false
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql",
+    "username": "c56668_telegram_store_na4u_ru",
+    "password": "NaMdeVixreyav72",
+    "database": "c56668_telegram_store_na4u_ru",
+    "host": "127.0.4.3",
+    "dialect": "postgres",
     "operatorsAliases": false
   }
 }
