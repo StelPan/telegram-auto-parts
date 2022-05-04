@@ -1,12 +1,16 @@
 const { Composer } = require("telegraf");
+const { FaqAction } = require("../actions/faq.action");
+const { ShowCartAction } = require("../actions/cart.action");
 
 const composer = new Composer();
 
 // composer.command("/catalog", async (ctx) => )
 
-// composer.command("/cart", async (ctx) => )
+// Команда отображения товаров в корзине
+composer.command("/cart", ShowCartAction);
 
-// composer.command("/faq", async (ctx) => )
+// Команда отображения справочной информации
+composer.command("/faq", FaqAction);
 
 // composer.command("/orders", async (ctx) => )
 

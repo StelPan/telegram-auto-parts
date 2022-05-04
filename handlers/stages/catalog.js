@@ -1,61 +1,18 @@
 const { Composer } = require("telegraf");
-const CatalogKeyboard = require("../../keyboards/catalog.keyboard");
+const { CatalogAction, PaginateCatalogAction } = require("../actions/catalog.action");
 const { editProductKeyboard } = require("../../keyboards/product.inline");
-const { category, product, cart, favorite } = require("../../models");
+const { product, cart, favorite } = require("../../models");
 const { keys } = require("../../keyboards/start.keyboard");
 
 const composer = new Composer();
 
 const LIMIT_VIEW_PRODUCT = 2
 
-composer.hears(keys.CATALOG_TYPE,async (ctx) => {
-    const catalog = category.findAll({ limit: LIMIT_VIEW_PRODUCT });
-    const countCatalog = category.count();
+// Отображение категорий товаров
+composer.hears(keys.CATALOG_TYPE, CatalogAction);
 
-    const [categories, count] = await Promise.all([
-        catalog,
-        countCatalog
-    ]);
-
-    const keyboard = CatalogKeyboard(categories, count, 1, LIMIT_VIEW_PRODUCT);
-
-    const message = `Всего категорий: ${count} \r\n`;
-
-    await ctx.reply(message, keyboard);
-});
-
-/**
- * Пагинация
- */
-composer.action(/^PAGE:[0-9]+$/, async (ctx) => {
-    await ctx.answerCbQuery();
-
-    const page = +ctx
-        .update
-        .callback_query
-        .data
-        .split(':')[1]
-
-    if(!page) {
-        return;
-    }
-
-    const catalog = category.findAll({
-        limit: LIMIT_VIEW_PRODUCT,
-        offset: LIMIT_VIEW_PRODUCT * page - LIMIT_VIEW_PRODUCT
-    });
-
-    const countCatalog = category.count();
-
-    const [categories, count] = await Promise.all([
-        catalog,
-        countCatalog
-    ]);
-
-    const keyboard = CatalogKeyboard(categories, count, page, LIMIT_VIEW_PRODUCT);
-    const message = `Всего категорий: ${count} \r\n`;
-    await ctx.editMessageText(message, keyboard);
-});
+// Вывод категорий в постраничной пагинации
+composer.action(/^PAGE:[0-9]+$/, PaginateCatalogAction);
 
 composer.action(/(CATEGORY:[0-9]+|PAGE_PRODUCT:[0-9]+)/, require("../scenes/actions/view-product.action"));
 
@@ -150,14 +107,11 @@ composer.action(/ADD_TO_FAVORITE:[0-9]+/, async (ctx) => {
 
 composer.action(/GO_TO_HOME/, async (ctx) => {
     await ctx.deleteMessage();
-    await ctx.scene.leave();
 });
 
 composer.action(/GO_TO_CATALOG/, async (ctx) => {
     await ctx.answerCbQuery();
     await ctx.deleteMessage();
-
-    // await ctx.scene.enter("CatalogScene");
 })
 
 module.exports = composer;

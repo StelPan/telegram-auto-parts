@@ -1,115 +1,32 @@
 const path = require("path");
 const { Composer } = require("telegraf");
-const { cart, product, favorite } = require("../../models");
-const { cartAction } = require("../actions/cart.action");
+const { cart, favorite } = require("../../models");
+const {
+    ShowCartAction,
+    EditCartAction,
+    ClearCartAction,
+    DeleteProductAction
+} = require("../actions/cart.action");
+const { DeleteFavoriteProduct } = require("../actions/favorite.action");
 const favoriteKeyboard = require("../../keyboards/favorite.inline");
-const { keyboard: editCartKeyboard } = require("../../keyboards/edit-cart.keyboard");
 const { editProductKeyboard } = require("../../keyboards/product.inline");
 const { keys } = require("../../keyboards/start.keyboard");
-const { startHandler } = require("../actions/start.action");
 
 const composer = new Composer();
 
-composer.hears(keys.CART_TYPE, async (ctx) => {
-    const { message, cartKeyboard } = await cartAction(ctx);
-    await ctx.replyWithHTML(message, cartKeyboard);
-});
+composer.hears(keys.CART_TYPE, ShowCartAction);
 
-composer.action(/^CART_EDIT_PAGE:[0-9]+$/, async (ctx) => {
-    try {
-        const page = +ctx.update.callback_query.data.split(":")[1];
+composer.action(/CLEAR_CART/, ClearCartAction);
 
-        let userCart = await cart.findOrCreate({
-            where: { user_id: ctx.update.callback_query.from.id },
-            include: [{
-                model: product
-            }]
-        });
+composer.action(/^CART_DELETE_PRODUCT:[0-9]+$/, DeleteProductAction);
 
-        userCart = userCart[0];
+composer.action(/^DELETE_FAVORITE_PRODUCT:[0-9]+$/, DeleteFavoriteProduct);
 
-        const productsRequest = userCart.getProducts({ limit: 1, offset: page ? page - 1 : page, });
-        const countRequest = userCart.countProducts();
-        const [ products, count ] = await Promise.all([
-            productsRequest,
-            countRequest
-        ]);
-
-        if (!count) {
-            await ctx.answerCbQuery("Корзина пуста.");
-            return;
-        }
-
-        const cartProduct = products[0];
-        const keyboard = editCartKeyboard(cartProduct.id, count, page, 1);
-
-        const message = `Артикул товара: ${cartProduct.id} \r\n`
-            + `Название: ${cartProduct.name} \r\n`
-            + `Цена товара: ${cartProduct.price} \r\n`
-            + `Описание: ${cartProduct.description} \r\n`;
-
-        await ctx.editMessageText(message, keyboard);
-    } catch (err) {
-        console.error(err)
-    }
-})
-
-composer.action(/^CART_DELETE_PRODUCT:[0-9]+$/, async (ctx) => {
-    try {
-        const productId = +ctx.update.callback_query.data.split(":")[1]
-
-        const findProduct = await product.findByPk(productId)
-
-        const userCart = await cart.findOne({
-            where: { user_id: ctx.update.callback_query.from.id },
-            include: [{
-                model: product
-            }]
-        })
-
-        await userCart.removeProduct(findProduct);
-
-        const { message, cartKeyboard } = await startHandler(ctx);
-
-        await ctx.editMessageText(message, {
-            parse_mode: "HTML",
-            ...cartKeyboard
-        });
-    } catch (err) {
-        console.error(err)
-    }
-})
+composer.action(/^CART_EDIT_PAGE:[0-9]+$/, EditCartAction);
 
 composer.action(/^CART_EDIT_BACK$/, async (ctx) => {
-    try {
-        const { message, cartKeyboard } = await startHandler(ctx);
-
-        // TODO: FIXED
-        await ctx.deleteMessage();
-        await ctx.replyWithHTML(message, cartKeyboard);
-    } catch(err) {
-        console.error(err)
-    }
-})
-
-composer.action(/CLEAR_CART/, async (ctx) => {
-    await ctx.answerCbQuery();
     await ctx.deleteMessage();
-
-    const userCart = await cart.findOne({
-        where: { user_id: ctx.from.id },
-        include: [{
-            model: product
-        }]
-    })
-
-    const userProducts = await userCart.getProducts()
-
-    for (let product of userProducts) {
-        await userCart.removeProduct(product);
-    }
-
-    await ctx.reply("Ваша корзина пуста...")
+    await ShowCartAction(ctx);
 })
 
 composer.action(/^SHOW_FAVORITES:[0-9]+$/, async (ctx) => {
@@ -194,27 +111,6 @@ composer.action(/^SHOW_FAVORITES:[0-9]+$/, async (ctx) => {
         await ctx[method](...params);
     } catch (e) {
         console.error(e);
-    }
-})
-
-composer.action(/^DELETE_FAVORITE_PRODUCT:[0-9]+$/, async (ctx) => {
-    try {
-        const {
-            data,
-            from: { id }
-        } = ctx.update.callback_query;
-
-        const [ , productId] = data.split(":");
-
-        const [findFavorite, ] = await favorite.findOrCreate({ where: {user_id: id}})
-        await findFavorite.removeProduct(productId);
-
-        const { message, cartKeyboard } = await startHandler(ctx);
-
-        await ctx.deleteMessage();
-        await ctx.reply(message, cartKeyboard);
-    } catch (e) {
-        console.log(e);
     }
 })
 

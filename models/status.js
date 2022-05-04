@@ -7,7 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     underscored: true,
   });
   status.associate = function(models) {
-    // associations can be defined here
+    status.hasMany(models.order);
   };
   return status;
 };

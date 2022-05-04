@@ -21,6 +21,7 @@
     "database": "c56668_telegram_store_na4u_ru",
     "host": "127.0.4.3",
     "dialect": "postgres",
-    "operatorsAliases": false
+    "operatorsAliases": false,
+    "logging": false
   }
 }

@@ -6,10 +6,11 @@ const unlessRoutes = [
     /^\/auth\/login(.*)$/,
     /^\/auth\/logout(.*)$/,
     /^\/images\/(.*)$/,
+    /^\/users(.*)$/, // TODO: Для создания дефолтного администратора
+    /^\/register(.*)$/,
 ];
 
 const { JSON_WEB_TOKEN } = process.env;
-console.log(JSON_WEB_TOKEN)
 
 const JWTMiddleware = jwt({
     secret: JSON_WEB_TOKEN,

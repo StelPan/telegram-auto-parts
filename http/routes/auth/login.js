@@ -45,7 +45,6 @@ const LoginAction = async function (req, res) {
             expire: Date.now() + 60 * 60 * 24,
         })
 
-        // TODO: отправляем токены
         res.status(200).json({
             tokens: { access, refresh },
             worker: findWorker,

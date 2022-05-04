@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     status_id: DataTypes.INTEGER,
     total_cash: DataTypes.INTEGER,
     data: DataTypes.JSONB,
+    worker_comments: DataTypes.STRING,
     admin_description: DataTypes.STRING
   }, {
     underscored: true,

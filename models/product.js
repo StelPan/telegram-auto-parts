@@ -8,6 +8,7 @@ module.exports = (sequelize, DataTypes) => {
     attribute_id: DataTypes.INTEGER,
   }, {
     underscored: true,
+    // paranoid: true,
   });
   product.associate = function(models) {
     /**
@@ -64,15 +65,7 @@ module.exports = (sequelize, DataTypes) => {
           },
         }, {
           model: models.image
-        }
-          //   {
-          //   model: models.favorite,
-          //   where: { id: favorite_id }
-          // },
-          //   {
-          //   model: models.image
-          // }
-        ]
+        }]
       }
     })
   };

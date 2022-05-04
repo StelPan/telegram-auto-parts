@@ -1,29 +1,18 @@
 const { Composer } = require("telegraf");
 const { keys } = require("../../keyboards/start.keyboard");
-const { startAction } = require("../actions/start.action");
+
+const { ContactsAction }    = require("../actions/contacts.action");
+const { FaqAction }         = require("../actions/faq.action");
+const { startAction }       = require("../actions/start.action");
 
 const composer = new Composer();
 
 composer.start(startAction);
 
-composer.hears(keys.CONTACTS_TYPE, async (ctx) => {
-    try {
-        const message =
-            "<b>Обратная связь</b> \r\n" +
-            "Почтовый адрес: autopartssupport@gmail.com. \r\n" +
-            "Телефон: +7-3842-32-34-23";
+// Контактная информация
+composer.hears(keys.CONTACTS_TYPE, ContactsAction);
 
-        await ctx.replyWithHTML(message);
-    } catch (e) {
-        console.error(e);
-    }
-})
-
-composer.hears(keys.FAQ_TYPE, async (ctx) => {
-    const message =
-        `- Добавляйте товары, нажав на кнопку "В корзину" \r\n` +
-        `- Добавляйте товары в "Избранные" нажав на кнопку добавить "в избранное" \r\n`
-    await ctx.reply(message);
-});
+// Справочная информация
+composer.hears(keys.FAQ_TYPE, FaqAction);
 
 module.exports = composer;

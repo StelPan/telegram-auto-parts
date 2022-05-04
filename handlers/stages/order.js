@@ -1,7 +1,11 @@
 const { Composer } = require("telegraf");
 const { user, product, status } = require("../../models");
 const { keys } = require("../../keyboards/start.keyboard");
+const { ShowOrderAction } = require("../actions/order.action");
+const orderKeyboard = require("../../keyboards/orders.keyboard");
 const composer = new Composer();
+
+composer.action(/ORDER:[0-9]+/, ShowOrderAction);
 
 composer.hears(keys.ORDERS_TYPE, async (ctx) => {
     try {
@@ -31,7 +35,7 @@ composer.hears(keys.ORDERS_TYPE, async (ctx) => {
                 `--------------------- \r\n`;
         }
 
-        await ctx.replyWithHTML(message);
+        await ctx.replyWithHTML(message, orderKeyboard(orders));
     } catch (e) {
         console.error(e);
     }

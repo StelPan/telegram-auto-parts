@@ -1,7 +1,5 @@
-const { Composer } = require("telegraf")
+const { Composer } = require("telegraf");
 
-const composer = new Composer()
-
-// composer.use()
+const composer = new Composer();
 
 module.exports = Composer;

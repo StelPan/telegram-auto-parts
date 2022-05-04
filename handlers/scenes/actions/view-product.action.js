@@ -84,8 +84,6 @@ const ViewProduct = async (ctx) => {
             await ctx.deleteMessage() :
             ""
 
-        // console.log(method, sourceHttp, source);
-
         const params = !isSendPhoto ?
             [{ source }, {
                 caption: message,
@@ -95,8 +93,6 @@ const ViewProduct = async (ctx) => {
                 parse_mode: "Markdown",
                 ...keyboard
             }];
-
-        console.log("PARAMS", params);
 
         await ctx.answerCbQuery();
         await switchMethodCtx(ctx, method, params)

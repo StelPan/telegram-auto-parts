@@ -1,7 +1,7 @@
 const { createQueue } = require("../../queue-connect");
 const process = require("./process");
 
-const Queue = createQueue("client-order-notification");
+const Queue = createQueue("worker-order-notification");
 Queue.process(process);
 
 module.exports = (data, config = {}) => {

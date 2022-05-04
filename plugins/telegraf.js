@@ -14,17 +14,13 @@ bot.use(
     middlewares,
     session(),
     stages,
+    require("../handlers/commands"),
     require("../handlers/stages/start"),
     require("../handlers/stages/catalog"),
     require("../handlers/stages/cart"),
     require("../handlers/stages/order"),
     require("../handlers/stages/search"),
 )
-//
-//
-// bot.start(async (ctx) => {
-//     await ctx.scene.enter("PreviewScene");
-// })
 
 const webhookPath = TELEGRAM_WEBHOOK_URL + `/telegraf/${bot.secretPathComponent()}`
 
