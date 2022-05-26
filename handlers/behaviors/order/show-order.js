@@ -24,7 +24,15 @@ async function ShowOrderAction (ctx) {
             `------------------------------ \r\n`;
     }
 
-    await ctx.editMessageText(message);
+    if (findOrder.worker_comments && findOrder.worker_comments.length > 0) {
+        message += "\r\n\r\n" +
+            `Оповещение менеджера: ` +
+            findOrder.worker_comments;
+    }
+
+    await ctx.editMessageText(message, Markup.inlineKeyboard([
+        [ Markup.button.callback("Вернуться назад", "GO_TO_ORDERS") ]
+    ]));
 }
 
 module.exports = {

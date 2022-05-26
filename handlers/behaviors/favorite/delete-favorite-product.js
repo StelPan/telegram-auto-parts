@@ -1,6 +1,6 @@
 const path                  = require("path");
 const { favorite }          = require(path.resolve("models"));
-const { ShowCartAction }    = require("./cart.action");
+const { ShowCartAction }    = require("../cart/show-cart");
 
 async function DeleteFavoriteProduct (ctx) {
     try {

@@ -4,7 +4,8 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     is_show: DataTypes.BOOLEAN
   }, {
-    underscored: true
+    underscored: true,
+    paranoid: true
   });
   // category.addScope("includesAll", )
   category.associate = function(models) {

@@ -1,13 +1,15 @@
 const { Composer } = require("telegraf");
 const { user, product, status } = require("../../models");
-const { keys } = require("../../keyboards/start.keyboard");
-const { ShowOrderAction } = require("../actions/order.action");
+const { ORDERS_TYPE } = require("../../keyboards/keyboard-keys");
+const { ShowOrderAction } = require("../behaviors/order/show-order");
 const orderKeyboard = require("../../keyboards/orders.keyboard");
+const { template } = require("../../templates");
+
 const composer = new Composer();
 
 composer.action(/ORDER:[0-9]+/, ShowOrderAction);
 
-composer.hears(keys.ORDERS_TYPE, async (ctx) => {
+composer.hears(ORDERS_TYPE, async (ctx) => {
     try {
         const clientCollect = await user.findByPk(ctx.from.id);
 
@@ -19,21 +21,7 @@ composer.hears(keys.ORDERS_TYPE, async (ctx) => {
             order: [["id", "desc"]]
         });
 
-        let message =
-            `Показано последние 10 заказов. \r\n` +
-            `<b>Список ваших заказов:</b> \r\n \r\n`;
-
-        for (let order of orders) {
-            const products = order.get("products");
-
-            message +=
-                `<b>Номер заказа</b>: ${order.id}. \r\n` +
-                `Статус заказа: ${order.status.name}. \r\n` +
-                `Итоговая сумма заказ: ${order.total_cash}. \r\n` +
-                `Скидочный купон: Отсутвует. \r\n` +
-                `Дата заказа: ${order.createdAt} \r\n` +
-                `--------------------- \r\n`;
-        }
+        const message = template.get("view-orders", orders);
 
         await ctx.replyWithHTML(message, orderKeyboard(orders));
     } catch (e) {

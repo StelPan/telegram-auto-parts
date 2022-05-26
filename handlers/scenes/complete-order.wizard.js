@@ -1,25 +1,31 @@
 const path = require("path");
 const { Scenes: { WizardScene } } = require("telegraf");
-const { startAction } = require("../actions/start.action");
+const { startAction } = require("../behaviors/start.action");
 const { order, cart, status } = require(path.resolve("models"));
-const notify = require(path.resolve("queue", "notifications", "ordering-client"));
+const notifyClient  = require(path.resolve("queue", "notifications", "ordering-client"));
+const notifyAdmin   = require(path.resolve("queue", "notifications", "ordering-workers"));
+
 
 const SCENE_TYPE = "CompleteOrder";
 
 const CompleteOrder = new WizardScene(
     SCENE_TYPE,
     async (ctx) => {
-        const address = ctx
-            .update
-            .message
-            .text;
+        try {
+            const address = ctx
+                .update
+                .message
+                .text;
 
-        ctx.session.orderRegistered = {
-            address,
-        };
+            ctx.session.orderRegistered = {
+                address,
+            };
 
-        await ctx.reply("Введите номер мобильного телефона:");
-        await ctx.wizard.next();
+            await ctx.reply("Введите номер мобильного телефона:");
+            await ctx.wizard.next();
+        } catch (e) {
+            console.error(e);
+        }
     }, async (ctx) => {
         const phone = ctx
             .update
@@ -79,9 +85,14 @@ const CompleteOrder = new WizardScene(
 
         await ctx.reply(message);
 
-        await notify({
+        await notifyClient({
             order: createOrder,
             products: clientProducts,
+            subject: "Новый заказ"
+        });
+
+        await notifyAdmin({
+            order: createOrder,
             subject: "Новый заказ"
         });
 

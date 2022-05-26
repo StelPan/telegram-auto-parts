@@ -1,6 +1,8 @@
 const emoji = require("node-emoji");
 const { user, cart, favorite } = require("../../models");
 
+const { APP_NAME } = process.env;
+
 const NewUserMiddleware = async (ctx, next) => {
     try {
         const
@@ -11,25 +13,24 @@ const NewUserMiddleware = async (ctx, next) => {
             return;
         }
 
-        const existUser = await user.findByPk(id);
+        const [client, created] = await user.findOrCreate({
+            where: { id }
+        });
 
-        if (!existUser) {
-            await user.create({
-                id: id,
-                information: info,
-                balance: 0,
-            });
+        if (created) {
+            // Update user after create
+            await client.update({ information: info, balance: 0 });
 
             await ctx.reply(
                 `Привет, ${info.first_name}! ${emoji.get("smiley")} \r\n` +
-                `Рады видеть тебя в нашем магазине "Глазурь" ${emoji.get("doughnut")} \r\n` +
-                `Большой ассортимент кондитерских товаров и удобный поиск доступны для тебя здесь. \r\n` +
+                `Рады видеть тебя в нашем магазине "${ APP_NAME }" ${emoji.get("doughnut")} \r\n` +
+                `Большой ассортимент различных аксессуаров для вашего автомобиля у нас!. \r\n` +
                 `Желем удачных покупок!`
             );
         }
 
-        await cart.findOrCreate({ where: { user_id: existUser.id } });
-        await favorite.findOrCreate({ where: { user_id: existUser.id }});
+        await cart.findOrCreate({ where: { user_id: client.id } });
+        await favorite.findOrCreate({ where: { user_id: client.id }});
 
         next();
     } catch (error) {

@@ -4,7 +4,11 @@ const notify = require(path.resolve("queue", "notifications", "ordering-client")
 
 async function UpdateUserOrder (form, order) {
     let updateParams = {}
-    if (form.hasOwnProperty("worker_comments") && form.worker_comments.length) {
+    if (
+        form.hasOwnProperty("worker_comments") &&
+        typeof form.worker_comments === "string" &&
+        form.worker_comments.length
+    ) {
         updateParams.worker_comments = form.worker_comments;
     }
 

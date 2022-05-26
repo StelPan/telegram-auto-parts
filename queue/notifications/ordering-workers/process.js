@@ -4,14 +4,23 @@ const { send: sendEmail } = require(path.resolve("email", "email"));
 
 const Process = async (job, done) => {
     try {
-        const { data: { order, subject } } = job;
-
         const workers = await worker.findAll();
 
+        const emails = workers
+            .filter(worker => worker.email ? worker.email : false)
+            .map(worker => worker.email)
+            .join(", ");
+
+        if (!emails.length) {
+            return done();
+        }
+
+        const { data: { order, subject } } = job;
+
         const configuration = {
-            to: order.data.email, // TODO: Добавить в профиль администраторов колонку с e-mail
+            to: emails,
             subject,
-            template: "/worker/create-order",
+            template: "/admin/create-order",
             context: { order },
         };
 

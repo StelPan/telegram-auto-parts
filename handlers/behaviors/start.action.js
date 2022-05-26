@@ -1,4 +1,4 @@
-const {keyboard, keys} = require("../../keyboards/start.keyboard");
+const { keyboard } = require("../../keyboards/start.keyboard");
 
 const startAction = async function (ctx) {
     try {

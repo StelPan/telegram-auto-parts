@@ -1,35 +1,7 @@
-const path = require("path");
-const { Composer } = require("telegraf");
-const { cart, favorite } = require("../../models");
-const {
-    ShowCartAction,
-    EditCartAction,
-    ClearCartAction,
-    DeleteProductAction
-} = require("../actions/cart.action");
-const { DeleteFavoriteProduct } = require("../actions/favorite.action");
-const favoriteKeyboard = require("../../keyboards/favorite.inline");
-const { editProductKeyboard } = require("../../keyboards/product.inline");
-const { keys } = require("../../keyboards/start.keyboard");
+const {favorite, cart} = require("../../../models");
+const favoriteKeyboard = require("../../../keyboards/favorite.inline");
 
-const composer = new Composer();
-
-composer.hears(keys.CART_TYPE, ShowCartAction);
-
-composer.action(/CLEAR_CART/, ClearCartAction);
-
-composer.action(/^CART_DELETE_PRODUCT:[0-9]+$/, DeleteProductAction);
-
-composer.action(/^DELETE_FAVORITE_PRODUCT:[0-9]+$/, DeleteFavoriteProduct);
-
-composer.action(/^CART_EDIT_PAGE:[0-9]+$/, EditCartAction);
-
-composer.action(/^CART_EDIT_BACK$/, async (ctx) => {
-    await ctx.deleteMessage();
-    await ShowCartAction(ctx);
-})
-
-composer.action(/^SHOW_FAVORITES:[0-9]+$/, async (ctx) => {
+async function ShowFavorites (ctx) {
     try {
         const {
             data,
@@ -112,49 +84,8 @@ composer.action(/^SHOW_FAVORITES:[0-9]+$/, async (ctx) => {
     } catch (e) {
         console.error(e);
     }
-})
+}
 
-composer.action(/ADD_CART_PRODUCT_FROM_FAVORITE:[0-9]+/, async (ctx) => {
-    try {
-        const { callback_query } = ctx.update;
-
-        const {
-            data,
-            message: { reply_markup, caption },
-            from: { id }
-        } = callback_query;
-
-        const [_, productId] = data.split(":");
-
-        const [userCart, ] = await cart.findOrCreate({where: {user_id: id}});
-
-        const editKeyboard = editProductKeyboard(reply_markup.inline_keyboard);
-
-        const exist = await userCart.getProducts({ where: { id: productId }});
-
-        exist.length ?
-            await userCart.removeProduct(productId) :
-            await userCart.addProduct(productId);
-
-        exist.length ?
-            editKeyboard.editCartButton("В корзину") :
-            editKeyboard.editCartButton("В корзине");
-
-        await ctx.editMessageCaption(caption, {
-            parse_mode: "Markdown",
-            ...editKeyboard
-                .arrayToInline()
-                .getKeyboard()
-        });
-    } catch (e) {
-        console.error(e);
-    }
-});
-
-composer.action(/ORDER_COMPLETE/, async (ctx) => {
-    await Promise.all([
-        ctx.scene.enter("CompleteOrder"),
-    ]);
-})
-
-module.exports = composer;
+module.exports = {
+    ShowFavorites,
+};

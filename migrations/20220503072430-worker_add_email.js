@@ -23,5 +23,7 @@ module.exports = {
       Example:
       return queryInterface.dropTable('users');
     */
+    // TODO: Fixed for return "Promise"
+    return Promise.resolve();
   }
 };

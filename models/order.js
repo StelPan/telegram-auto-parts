@@ -10,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     admin_description: DataTypes.STRING
   }, {
     underscored: true,
+    paranoid: true
   });
   order.associate = function(models) {
     /**
