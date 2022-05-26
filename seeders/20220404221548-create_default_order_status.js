@@ -18,13 +18,18 @@ module.exports = {
       created_at: new Date(),
       updated_at: new Date()
     }, {
-      name: "Ожидает доставки",
+      name: "Доставляется по адресу",
       color: "#3e89f9",
       created_at: new Date(),
       updated_at: new Date()
     }, {
       name: "Отклонен",
       color: "#ff0015",
+      created_at: new Date(),
+      updated_at: new Date()
+    },  {
+      name: "Ожидает оплаты",
+      color: "#ea850f",
       created_at: new Date(),
       updated_at: new Date()
     }]);

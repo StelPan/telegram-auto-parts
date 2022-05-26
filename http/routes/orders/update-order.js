@@ -1,6 +1,7 @@
 const path = require("path");
+const { bot } = require("../../../plugins/telegraf");
 const { order, product, status } = require(path.resolve("models"));
-const notify = require(path.resolve("queue", "notifications", "ordering-client"));
+//const notify = require(path.resolve("queue", "notifications", "ordering-client"));
 
 async function UpdateUserOrder (form, order) {
     let updateParams = {}
@@ -40,13 +41,11 @@ const UpdateOrderAction = async function (req, res) {
 
         await UpdateUserOrder(form, findOrder);
 
-        if(isNotify) {
-            notify({
-                order,
-                products: order.products,
-                subject: "Обновление по заказу"
-            });
-        }
+        // TODO: Notify in telegram app
+        await bot.telegram.sendMessage(
+            findOrder.user_id,
+            `Заказ №${findOrder.id} обновился. \r\nПосмотрите изменения в разделе заказы.`
+        );
 
         res.status(200).json({
             type: "ORDER_UPDATED",

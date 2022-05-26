@@ -14,6 +14,7 @@ const Process = async (job, done) => {
 
         await sendEmail(configuration);
 
+
         return done();
     } catch(e) {
         console.error(e);
