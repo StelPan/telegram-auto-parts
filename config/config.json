@@ -16,10 +16,10 @@
     "operatorsAliases": false
   },
   "production": {
-    "username": "c56668_telegram_store_na4u_ru",
-    "password": "NaMdeVixreyav72",
-    "database": "c56668_telegram_store_na4u_ru",
-    "host": "127.0.4.3",
+    "username": "c58820_panel_shop_na4u_ru",
+    "password": "WuQquVecnoyoz97",
+    "database": "c58820_panel_shop_na4u_ru",
+    "host": "127.0.4.32",
     "dialect": "postgres",
     "operatorsAliases": false,
     "logging": false
