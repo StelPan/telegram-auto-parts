@@ -17,6 +17,10 @@
   },
   "production": {
     "url": "postgresql://c58820_panel_shop_na4u_ru:WuQquVecnoyoz97@postgres.c58820.h2/c58820_panel_shop_na4u_ru",
+    "username": "c58820_panel_shop_na4u_ru",
+    "password": "WuQquVecnoyoz97",
+    "database": "c58820_panel_shop_na4u_ru",
+    "host": "postgres.c58820.h2",
     "dialect": "postgres"
   }
 }
