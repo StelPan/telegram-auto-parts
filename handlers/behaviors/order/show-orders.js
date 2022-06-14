@@ -11,7 +11,8 @@ async function ShowOrders (ctx) {
                 { model: product },
                 { model: status },
             ],
-            order: [["id", "desc"]]
+            order: [["id", "desc"]],
+            limit: 10
         });
 
         const message = template.get("view-orders", orders);

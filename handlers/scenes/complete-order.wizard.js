@@ -5,7 +5,6 @@ const { order, cart, status } = require(path.resolve("models"));
 const notifyClient  = require(path.resolve("queue", "notifications", "ordering-client"));
 const notifyAdmin   = require(path.resolve("queue", "notifications", "ordering-workers"));
 
-
 const SCENE_TYPE = "CompleteOrder";
 
 const CompleteOrder = new WizardScene(

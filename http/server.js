@@ -8,19 +8,34 @@ const app = express();
 
 dotenv.config({
     path: path.resolve("./", ".env")
-})
-
-// Middlewares
-const { JWTMiddleware } = require("./middlewares/jwt");
+});
 
 const PORT = process.env.APP_PORT || 3000;
 const API = process.env.APP_IP || "127.0.0.1";
 
-app.use(express.static("static"));
-app.use(cors());
+app.use(cors({
+    origin: "*",
+    methods: ['GET','POST','DELETE','UPDATE','PUT','PATCH'],
+}));
+
+app.use(express.static(path.resolve("static")));
+
+app.use("/images", require("./routes/image"));
+
+app.get('*', function (req, res) {
+    try {
+        res.sendFile(path.resolve("static", "index.html"));
+    } catch(e) {
+        console.error(e);
+    }
+});
+
+app.use(require("./middlewares/jwt").JWTMiddleware);
+
 app.use(paginate.middleware(10, 30));
+
 app.use(bodyParser.json());
-app.use(JWTMiddleware);
+
 app.use(function (err, req, res, next) {
     if (err.name === "UnauthorizedError") {
         res.status(401).json({
@@ -30,7 +45,6 @@ app.use(function (err, req, res, next) {
     }
 });
 
-app.use("/images", require("./routes/image"));
 app.use("/auth", require("./routes/auth"));
 app.use("/users", require("./routes/users"));
 app.use("/products", require("./routes/products"));
@@ -40,7 +54,7 @@ app.use("/order-statuses", require("./routes/statuses"));
 app.use("/register", require("./routes/register"));
 
 async function listen (cb = null) {
-    cb(app)
+    cb(app);
 
     app.listen(PORT, API, () => console.log(`Server started on ${PORT}..`));
 }
