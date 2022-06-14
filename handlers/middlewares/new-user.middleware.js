@@ -23,7 +23,7 @@ const NewUserMiddleware = async (ctx, next) => {
 
             await ctx.reply(
                 `Привет, ${info.first_name}! ${emoji.get("smiley")} \r\n` +
-                `Рады видеть тебя в нашем магазине "${ APP_NAME }" ${emoji.get("doughnut")} \r\n` +
+                `Рады видеть тебя в нашем магазине "${ APP_NAME }" ${emoji.get("gear")} \r\n` +
                 `Большой ассортимент различных аксессуаров для вашего автомобиля у нас!. \r\n` +
                 `Желем удачных покупок!`
             );
