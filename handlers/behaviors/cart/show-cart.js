@@ -14,7 +14,9 @@ async function ShowCartAction (ctx) {
 
     const cartProducts = await userCart.getProducts();
 
-    let message = `Ваша корзина: \r\n`;
+    let message = `Нажимая кнопку "Оформить заказ" вы соглашаетесь на обработку персональных данных, собираемых во время оформления заказа.  \r\n\r\n`;
+
+    message += `Ваша корзина: \r\n`;
 
     if (cartProducts.length) {
         let totalSum = 0;
